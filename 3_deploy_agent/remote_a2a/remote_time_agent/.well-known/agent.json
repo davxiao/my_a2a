@@ -1,0 +1,65 @@
+{
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "description": "An agent specialized in retrieving the current time in a specified city.",
+  "name": "remote_time_agent",
+  "protocolVersion": "1.0.0",
+  "provider": {
+    "organization": "Google",
+    "url": "https://google.com"
+  },
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "time_retrieval",
+      "name": "Time Retrieval",
+      "description": "Retrieve the current time in a specified city",
+      "tags": [
+        "time",
+        "location"
+      ],
+      "security": [
+        {
+          "oauth2": [
+            "agent:time"
+          ]
+        }
+      ]
+    }
+  ],
+  "url": "https://remote-time-agent-m74hb36eya-uc.a.run.app/a2a/remote_time_agent/",
+  "version": "1.0.0",
+  "securitySchemes": {
+    "oauth2": {
+      "type": "oauth2",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://integrator-4489750.okta.com/oauth2/default/v1/authorize",
+          "tokenUrl": "https://integrator-4489750.okta.com/oauth2/default/v1/token",
+          "refreshUrl": "https://integrator-4489750.okta.com/oauth2/default/v1/token",
+          "scopes": {
+            "agent:time": "Get the current time from the agent.",
+            "openid": "Basic user profile.",
+            "offline_access": "Refresh token."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "oauth2": [
+        "agent:time",
+        "openid",
+        "offline_access"
+      ]
+    }
+  ]
+}
