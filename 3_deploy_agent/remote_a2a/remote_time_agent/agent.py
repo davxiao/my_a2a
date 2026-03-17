@@ -237,7 +237,7 @@ class OAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         a2a_base_path = "/a2a/remote_time_agent"
         # Log the path for debugging visibility in Cloud Run logs
-        print(f"Incoming request path: {request.url.path}")
+        logger.info(f"Incoming request path: {request.url.path}")
 
         if request.url.path.startswith(a2a_base_path):
             # Allow public access to the agent card (discovery)
@@ -246,7 +246,7 @@ class OAuthMiddleware(BaseHTTPMiddleware):
                 return await call_next(request)
 
             auth_header = request.headers.get("Authorization")
-            print(f"DEBUG: Auth Header: {auth_header}")
+#            logger.info(f"Auth Bearer: {auth_header}")
 
             if not auth_header or not auth_header.startswith("Bearer "):
                 return JSONResponse(
@@ -269,22 +269,10 @@ class OAuthMiddleware(BaseHTTPMiddleware):
             async with httpx.AsyncClient() as client:
                 try:
                     # Using print to ensure visibility in Cloud Run stdout
-                    print(f"DEBUG: Introspection URL: {INTROSPECTION_URL}")
-                    print(f"DEBUG: Token (len): {len(token)}")
-                    print(
-                        f"DEBUG: Client ID Type: {type(RESOURCE_SERVER_CLIENT_ID)}"
-                    )
-                    print(
-                        f"DEBUG: Client Secret Type: {type(RESOURCE_SERVER_CLIENT_SECRET)}"
-                    )
-
+                    logger.info(f"Introspection URL: {INTROSPECTION_URL}")
                     # Ensure they are strings
                     rs_id = str(RESOURCE_SERVER_CLIENT_ID)
                     rs_secret = str(RESOURCE_SERVER_CLIENT_SECRET)
-
-                    print(
-                        f"DEBUG: Using Auth: {rs_id[:4]}... / (secret len: {len(rs_secret)})"
-                    )
 
                     response = await client.post(INTROSPECTION_URL,
                                                  data={
@@ -296,6 +284,8 @@ class OAuthMiddleware(BaseHTTPMiddleware):
                                                  auth=(rs_id, rs_secret))
                     response.raise_for_status()
                     token_info = response.json()
+
+                    logger.info(f"Token Info: {token_info}")
 
                     if not token_info.get("active"):
                         return JSONResponse(

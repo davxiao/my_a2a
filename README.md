@@ -11,6 +11,9 @@ The agent is built using:
 - **A2A SDK**: For implementing the A2A protocol endpoints.
 - **Google Cloud Run**: For serverless container deployment.
 
+Architecture Diagram
+![](./a2a-diagram.jpg)
+
 ## Project Structure
 
 ```
