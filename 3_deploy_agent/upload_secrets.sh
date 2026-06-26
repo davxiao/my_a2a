@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-echo "This script will upload secrets from .env to Google Secret Manager."
+echo "This script will upload the secrets saved in .env to Google Secret Manager for the container app to access later."
 read -p "Do you want to continue? [Y/n] " confirm
 confirm=${confirm:-Y}
 

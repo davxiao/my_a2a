@@ -28,6 +28,7 @@ echo "Submitting build for $SERVICE_NAME..."
 gcloud builds submit remote_a2a --tag gcr.io/$PROJECT_ID/$SERVICE_NAME
 
 # 2. Deploy to Cloud Run
+# the port must be the same as defined in Dockerfile
 echo "Deploying $SERVICE_NAME to Cloud Run..."
 gcloud run deploy $SERVICE_NAME \
     --image gcr.io/$PROJECT_ID/$SERVICE_NAME \
@@ -44,3 +45,4 @@ echo "Service Name: $SERVICE_NAME"
 echo "Region: $REGION"
 echo "To get the service URL, run: gcloud run services describe $SERVICE_NAME --platform managed --region $REGION --format 'value(status.url)'"
 echo "=================================================="
+

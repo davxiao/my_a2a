@@ -39,6 +39,7 @@ DEPLOY_ARGS="$SECRETS_ARGS $ENV_VARS_ARGS"
 
 # 1. Initial Build & Deploy to get the URL
 # We need to deploy first to let Cloud Run generate the deterministic URL for this service.
+# the port must be the same as defined in Dockerfile
 echo "[Step 1/3] Initial Build & Deploy (to generate URL)..."
 gcloud builds submit remote_a2a --tag gcr.io/$PROJECT_ID/$SERVICE_NAME
 gcloud run deploy $SERVICE_NAME --image gcr.io/$PROJECT_ID/$SERVICE_NAME --platform managed --region $REGION --port 8001 --no-invoker-iam-check $DEPLOY_ARGS
@@ -88,6 +89,7 @@ except Exception as e:
 "
 
 # 4. Final Build & Deploy
+# the port must be the same as defined in Dockerfile
 echo "[Step 3/3] Final Build & Deploy (with updated agent.json)..."
 gcloud builds submit remote_a2a --tag gcr.io/$PROJECT_ID/$SERVICE_NAME
 gcloud run deploy $SERVICE_NAME --image gcr.io/$PROJECT_ID/$SERVICE_NAME --platform managed --region $REGION --port 8001 --no-invoker-iam-check $DEPLOY_ARGS
