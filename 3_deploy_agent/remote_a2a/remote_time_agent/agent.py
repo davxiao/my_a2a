@@ -47,7 +47,7 @@ from a2a.server.tasks import InMemoryTaskStore
 load_dotenv()
 
 # Setup Okta
-OKTA_DOMAIN = os.environ.get("OKTA_DOMAIN", "trial-6400907.okta.com").replace("https://", "").replace("http://", "")
+OKTA_DOMAIN = os.environ.get("OKTA_DOMAIN", "integrator-4489750.okta.com").replace("https://", "").replace("http://", "")
 OKTA_AUTH_SERVER_ID = os.environ.get("OKTA_AUTH_SERVER_ID", "default")
 INTROSPECTION_URL = f"https://{OKTA_DOMAIN}/oauth2/{OKTA_AUTH_SERVER_ID}/v1/introspect"
 # These should be the credentials of the *A2A agent application itself* in Okta
@@ -287,19 +287,36 @@ class OAuthMiddleware(BaseHTTPMiddleware):
 
                     logger.info(f"Token Info: {token_info}")
 
+                    # Forproduction, consider at least two more checks in addition:
+                    # 1. token_info.client_id is known to the agent
+                    # 2. token_info.sub is allowed to access the agent
                     if not token_info.get("active"):
                         return JSONResponse(
                             status_code=401,
                             content={"error": "Token is not active"})
 
+                    iss = token_info.get("iss","")
+                    if iss != f"https://{OKTA_DOMAIN}/oauth2/{OKTA_AUTH_SERVER_ID}":
+                        return JSONResponse(
+                            status_code=401,
+                            content={"error": "Invalid token issuer"})
+
+                    client_id = token_info.get("client_id", "")
+                    if client_id != RESOURCE_SERVER_CLIENT_ID:
+                        return JSONResponse(
+                            status_code=401,
+                            content={"error": "Invalid client_id"})
+                    
                     scopes = token_info.get("scope", "").split(" ")
                     if "agent:time" not in scopes:
                         return JSONResponse(
-                            status_code=403,
+                            status_code=401,
                             content={
                                 "error": "Missing required scope: agent:time"
                             })
+
                     request.state.token_info = token_info
+
                 except httpx.HTTPStatusError as e:
                     print(
                         f"Introspection HTTP error: {e.response.status_code} - {e.response.text}"
